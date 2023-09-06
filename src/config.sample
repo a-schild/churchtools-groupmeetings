@@ -1,5 +1,7 @@
 <?php
 return array(
-    'serverURL' => 'you.church.tools',
+    'serverURL' => 'your.church.tools',
 	'groupTypeID' => 15
+    'loginID' => '<your-user-id>',
+    'loginToken' => 'your-api-key'
 );
