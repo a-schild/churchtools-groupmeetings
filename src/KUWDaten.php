@@ -14,6 +14,7 @@
 class KUWDaten {
     private $startDate;
     private $endTime;
+    private $classTitle;
     private $title;
     private $location;
     private $remarks;
@@ -68,6 +69,16 @@ class KUWDaten {
     public function getTitle(): ?string
     {
         return $this->title;
+    }
+    
+    public function setClassTitle(string $classTitle)
+    {
+        $this->classTitle= $classTitle;
+    }
+    
+    public function getClassTitle(): ?string
+    {
+        return $this->classTitle;
     }
     
     public function setLocation(string $location)

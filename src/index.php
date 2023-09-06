@@ -164,6 +164,7 @@ else
                             }
                         }
                         $kuwEntry= new KUWDaten();
+                        $kuwEntry->setClassTitle($calendarTitle);
                         $kuwEntry->setUID($meeting->getID().".".$meeting->getGroupID());
                         $kuwEntry->setIsCanceled($meeting->getIsCanceled());
                         $kuwEntry->setStartDate(new DateTime($meeting->getDateFrom()));
@@ -230,13 +231,16 @@ if (!$hasError && isset($_REQUEST["format"]) && $_REQUEST["format"] == "ics")
             else 
             {
                 array_push($uidEntries, $uuid);
-                $calSummary= $calName;
-                
-                preg_match("/(\d*)\.(\d*)/", $uuid, $matches, PREG_OFFSET_CAPTURE);
-                $groupID= $matches[2][0];
-                
-                $group= $selectedGroups->getGroupByID($groupID);
-                $calSummary= $group->getTitle();
+//                $calSummary= $calName;
+                $calSummary= $meeting->getClassTitle();
+//                preg_match("/(\d*)\.(\d*)/", $uuid, $matches, PREG_OFFSET_CAPTURE);
+//                $groupID= $matches[2][0];
+//                if ($selectedGroups != null) {
+//                    $group= $selectedGroups->getGroupByID($groupID);
+//                    $calSummary= $group->getName();
+//                } else {
+//                    $calSummary= "KUW";
+//                }
                 $eventobj = new CalendarEvent();
                 $eventobj->setUid($meeting->getUID()."@ref-nidau.ch");
                 $eventobj->setStart($meeting->getStartDate());
