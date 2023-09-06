@@ -1,7 +1,18 @@
 <?php
 return array(
     'serverURL' => 'your.church.tools',
-	'groupTypeID' => 15
-    'loginID' => '<your-user-id>',
+    // For which group type do you wish to generate
+	'groupType' => 15
+    //
+    // For login choose either user+pw login
+    // or the token based login
+    // 
+    // Token login is recommended
+    //
+    // For user+pw login use the two keys below
+    // 'loginUser' => '<your-user-login-email>',
+    // 'loginPassword' => '<your-user-login-password>',
+    // 
+    // For tokin login just fill in the token below (Recommended)
     'loginToken' => 'your-api-key'
 );

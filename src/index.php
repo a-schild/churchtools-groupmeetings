@@ -2,7 +2,18 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use ChurchTools\Api\Tools\CalendarTools;
+use CTApi\CTConfig;
+use CTApi\CTLog;
+// use CTApi\Models\Groups\Group\GroupRequest;
+
+use CTApi\Models\Group;
+use CTApi\Models\GroupRole;
+use CTApi\Models\GroupSettings;
+use CTApi\Requests\GroupRequest;
+
+use CTApi\Models\GroupMeeting;
+use CTApi\Models\GroupMeetingMember;
+
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Cache\Adapter\Filesystem\FilesystemCachePool;
@@ -38,38 +49,70 @@ else
     $configs = include('config.php');
     session_start();
     $serverURL= $configs["serverURL"];
-    $loginID= $configs["loginID"];
-    $loginToken= $configs["loginToken"];
+    if (array_key_exists("loginToken", $configs)) {
+        $loginToken= $configs["loginToken"];
+    } else {
+        $loginUser= $configs["loginUser"];
+        $loginPassword= $configs["loginPassword"];
+    }
 
-    $groupType= 5;
+    $groupType= $configs["groupType"]; // 5 = KUW
     $showLeader= 0;
 
     $errorMessage= null;
     try
     {
-        $api = \ChurchTools\Api\RestApi::createWithLoginIdToken($serverURL, $loginID, $loginToken);
-        $personMasterData= $api->getPersonMasterData();
-
-        $visibleGroupTypes= $personMasterData->getGroupTypes();
-        $visibleGroups= $personMasterData->getGroups();
-        $selectedGroups= $visibleGroups->getGroupsOfType($groupType);
+        CTLog::enableFileLog(); // enable logfile
+        CTLog::setConsoleLogLevelError();
+        CTLog::enableConsoleLog();        
+        CTConfig::setApiUrl($serverURL);
+        if (isset($loginToken)) {
+            CTConfig::setApiKey($loginToken);
+            if (! CTConfig::validateApiKey()) {
+                echo "Token login failed";
+                CTLog::getLog()->error("Token login failed!");
+                die;
+            } else {
+                CTLog::getLog()->debug("Token login ok");
+            }
+        } else {
+            CTConfig::authWithCredentials(
+                $loginUser,
+                $loginPassword);
+        }
+        //$api = \ChurchTools\Api\RestApi::createWithLoginIdToken($serverURL, $loginID, $loginToken);
+        //$personMasterData= $api->getPersonMasterData();
+        $selectedGroups = GroupRequest::where("group_type_ids", [$groupType])->get();
         $_SESSION["selectedGroups"]= $selectedGroups;
 
         foreach( $selectedGroups as $group) 
         {
-            if ($group->getChildIDS() != null && sizeof($group->getChildIDS()) > 0)
+            $childGroups = $group->requestGroupChildren()?->get();
+            if ($childGroups != null && sizeof($childGroups) > 0)
             {
                 // Has children, ignore it
+                CTLog::getLog()->debug("Ignoring parent group [". $group->getName() . "] id [" . $group->getId() . "]");
             }
             else
             {
-                $meetings= $api->getGroupMeetings($group->getId());
-                if ($group->getParentIDS() != null && sizeof($group->getParentIDS()) > 0)
+                CTLog::getLog()->debug("Get meetings for group [". $group->getName() . "] id [" . $group->getId() . "]");
+                try {
+                    $meetings= $group->requestGroupMeetings()->get();
+                }
+                catch (Exception $e)
                 {
+                    $meetings= null;
+                    CTLog::getLog()->warning("Get meetings for group [". $group->getName() . "] id [" . $group->getId() . "] failed");
+                }
+                $parentGroups = $group->requestGroupParents()->get();
+                if ($parentGroups  != null && sizeof($parentGroups ) > 0)
+                {
+                    CTLog::getLog()->debug("Got parent groups for [". $group->getName() . "] id [" . $group->getId() . "]");
                     // Has parents, look if there are groupmeetings too
-                    foreach($group->getParentIDS() as $gid)
+                    foreach($parentGroups as $gid)
                     {
-                        $meetings2= $api->getGroupMeetings($gid);
+                        CTLog::getLog()->debug("Get meetings for group [". $gid->getName() . "] id [" . $gid->getId() . "]");
+                        $meetings2= $gid->requestGroupMeetings()->get();
                         if ($meetings2 != null && sizeof($meetings2) > 0) {
                             if ($meetings != null && sizeof($meetings) > 0) {
                                 $meetings= array_merge($meetings, $meetings2);
@@ -80,14 +123,17 @@ else
                             }
                         }
                     }
+                } else {
+                    CTLog::getLog()->debug("No parent groups for [". $group->getName() . "] id [" . $group->getId() . "]");
                 }
+                //var_dump($meetings);
                 if ($meetings != null && sizeof($meetings) > 0) {
                     usort($meetings,
                         function ($a, $b)  {
-                            return $a->getStartDate()->getTimestamp() > $b->getStartDate()->getTimestamp();
+                            return $a->getDateFrom() > $b->getDateFrom();
                     });
                     $myCalendar= array();
-                    $calendarTitle= $group->getTitle();
+                    $calendarTitle= $group->getName();
                     foreach ($meetings as $meeting) 
                     { 
                         $pollResult= $meeting->getPollResult();
@@ -119,11 +165,11 @@ else
                         }
                         $kuwEntry= new KUWDaten();
                         $kuwEntry->setUID($meeting->getID().".".$meeting->getGroupID());
-                        $kuwEntry->setIsCanceled($meeting->isMeetingCanceled());
-                        $kuwEntry->setStartDate($meeting->getStartDate());
+                        $kuwEntry->setIsCanceled($meeting->getIsCanceled());
+                        $kuwEntry->setStartDate(new DateTime($meeting->getDateFrom()));
                         if ($untilTime != null)
                         {
-                            $kuwEntry->setEndTime($untilTime);
+                            $kuwEntry->setEndTime(new DateTime($untilTime));
                         }
                         $isFirst= true;
                         if ($pollResult != null) {
@@ -150,7 +196,7 @@ else
                         }
                         array_push($myCalendar, $kuwEntry);
                     } 
-                    $calendareEntries[$group->getTitle()]= $myCalendar;
+                    $calendareEntries[$group->getName()]= $myCalendar;
                 }
             }
         }
