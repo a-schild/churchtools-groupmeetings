@@ -1,0 +1,138 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 24.05.2019, 23:31:51
+    Author     : andre
+*/
+body {
+	background-color: #CCCCCC;
+}
+
+.container {
+	background-color: #99576D;
+}
+
+a:hover {
+    text-decoration: none;    
+}
+
+.calendarcol {
+    /* margin: 2px; */
+}
+
+.resourcecol {
+    /* nothing */
+}
+
+.resourcecol .form-check {
+    padding-left: 0;
+}
+
+.resourcecol .form-check label .form-check-input {
+/*    margin-left: 0.5rem;*/
+}
+
+.resourcecol .form-check label  {
+    padding-left: 2rem;
+    width: 95%;
+}
+
+.resourcecol .form-check label:hover  {
+    background-color: #eeeeee;
+}
+
+.calendar {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 1.8rem;
+    margin-bottom: 2px;
+}
+
+.resourcetype
+{
+    background-color: #cccccc;
+    padding-left: 2rem;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    margin-bottom: 2px;
+}
+
+.resourcetype h6 {
+    display: inline-block;
+}
+
+.rest-wrapper {
+    border-right: 1px solid #cccccc;
+    border-left: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    margin-top: -2px;
+}
+
+h1 {
+    background-color: #99576D;
+	color: white;
+    line-height: 70px;
+	border-bottom: 1px solid white;
+	padding-bottom: 1rem;
+	margin-left: -15px;
+	padding-left: 15px;	
+	margin-right: -15px;
+	padding-right: 15px;	
+}
+
+h2.group-title {
+    background-color: #99576D;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-left: 1rem;
+    margin-bottom: 0.25rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-top: 0.5rem;
+	color: white;
+	font-size: 1.5rem;
+}
+
+h2.footer {
+	text-align:center;
+	padding: 1rem 0;
+}
+
+h2 a {
+	color: white;
+	text-decoration: none;
+}
+
+h2 a:hover {
+	color: black;
+	text-decoration: none;
+}
+
+.row:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.row:nth-child(odd) {
+    background-color: white;
+}
+
+
+.ispast {
+    display: none;
+}
+
+.toprow {
+    margin-left: 0;
+    background-color: #99576D !important;
+}
+
+.pastbutton {
+    text-align: right;
+    border: 1px solid gray;
+    padding: 1rem;
+    background-color: silver;
+}
+

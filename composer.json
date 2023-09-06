@@ -1,0 +1,21 @@
+{
+    "name": "a-schild/churchtools-groupmeeting",
+    "description":"Create calendar entries from group meetings",
+    "keywords": [ "calendar", "ct", "churchtools"],
+    "type": "project",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "André Schild",
+            "email": "andre@schild.ws",
+            "homepage": "https://github.com/a-schild",
+            "role": "Developer"
+        }],
+    "require": {
+        "php": "^8.1",
+        "vineyardkoeln/churchtools-api": "dev-master",
+        "phpoffice/phpspreadsheet": "^1.29.0",
+        "cache/filesystem-adapter": "^1.2.0",
+        "jsvrcek/ics": "*"
+    }
+}
