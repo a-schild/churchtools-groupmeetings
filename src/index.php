@@ -28,10 +28,14 @@ use Jsvrcek\ICS\CalendarExport;
 
 require_once 'KUWDaten.php';
 include_once("config.php");
-$filesystemAdapter = new Local(__DIR__.'/');
+$cacheLocation= sys_get_temp_dir() . '/kuwdaten/';
+
+$filesystemAdapter = new Local($cacheLocation);
 $filesystem        = new Filesystem($filesystemAdapter);
 
-
+if (!file_exists( $cacheLocation)) {
+    mkdir( $cacheLocation);
+}
 $cachePool = new FilesystemCachePool($filesystem);
 $cacheKeyCalEntries= "kuwDaten";
 $cacheKeyGroups= "kuwgroups";
@@ -46,6 +50,7 @@ if ($cachePool->hasItem($cacheKeyCalEntries) && $cachePool->hasItem($cacheKeyGro
 }
 else
 {
+    set_time_limit(60); // Allow more time to retrieve entries
     $configs = include('config.php');
     session_start();
     $serverURL= $configs["serverURL"];
@@ -62,9 +67,15 @@ else
     $errorMessage= null;
     try
     {
-        CTLog::enableFileLog(); // enable logfile
-        CTLog::setConsoleLogLevelError();
-        CTLog::enableConsoleLog();        
+        if ($configs["loggingToFileEnabled"]) {
+            CTLog::enableFileLog(); // enable logfile
+        }
+        if ($configs["loggingToConsoleEnabled"]) {
+            CTLog::enableConsoleLog();
+            if ($configs["loggingLevelDebug"]) {
+                CTLog::setConsoleLogLevelDebug();
+            }
+        }
         CTConfig::setApiUrl($serverURL);
         if (isset($loginToken)) {
             CTConfig::setApiKey($loginToken);
@@ -201,8 +212,8 @@ else
                 }
             }
         }
-        $cachePool->set($cacheKeyCalEntries, $calendareEntries, 3600);
-        $cachePool->set($cacheKeyGroups, $visibleGroups, 3600);
+        $cachePool->set($cacheKeyCalEntries, $calendareEntries, $configs["cacheLifeTime"]);
+        $cachePool->set($cacheKeyGroups, $visibleGroups, $configs["cacheLifeTime"]);
     }
     catch (Exception $e)
     {

@@ -14,5 +14,11 @@ return array(
     // 'loginPassword' => '<your-user-login-password>',
     // 
     // For tokin login just fill in the token below (Recommended)
-    'loginToken' => 'your-api-key'
+    'loginToken' => 'your-api-key',
+    'loggingToFileEnabled' => false,
+    'loggingToConsoleEnabled' => false,
+    'loggingLevelDebug' => false,
+    // How long entries are cached in seconds, before they are fetched from CT again
+    // Default 1 hour
+    'cacheLifeTime' => 3600
 );
