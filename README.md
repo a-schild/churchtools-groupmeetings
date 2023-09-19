@@ -2,7 +2,10 @@
 Create ical feed from group meetings
 
 Optionally it can also create a html page with the meetings.
-In that case you have to modify the images
+In that case you have to modify the images.
+
+Currently all meetings 1 year back and one year in the future are processed.
+Currently there is no config to change this
 
 ## How to install
 - git clone https://github.com/a-schild/churchtools-groupmeetings.git
