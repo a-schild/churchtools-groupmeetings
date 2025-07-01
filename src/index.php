@@ -5,11 +5,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use CTApi\CTConfig;
 use CTApi\CTLog;
-// use CTApi\Models\Groups\Group\GroupRequest;
-use CTApi\Models\Group;
 use CTApi\Models\GroupRole;
 use CTApi\Models\GroupSettings;
-use CTApi\Requests\GroupRequest;
+use CTApi\Models\Groups\Group;
+use CTApi\Models\Groups\Group\GroupRequest;
 use CTApi\Models\GroupMeeting;
 use CTApi\Models\GroupMeetingMember;
 use League\Flysystem\Adapter\Local;
@@ -73,8 +72,8 @@ if ($cachePool->hasItem($cacheKeyCalEntries) && $cachePool->hasItem($cacheKeyGro
     try {
         CTConfig::setApiUrl($serverURL);
         if (isset($loginToken)) {
-            CTConfig::setApiKey($loginToken);
-            if (!CTConfig::validateApiKey()) {
+            // CTConfig::setApiKey($loginToken);
+            if (!CTConfig::authWithLoginToken($loginToken)) {
                 echo "Token login failed";
                 CTLog::getLog()->error("Token login failed!");
                 die;

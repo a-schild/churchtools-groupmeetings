@@ -14,6 +14,9 @@ return array(
     // 'loginPassword' => '<your-user-login-password>',
     // 
     // For tokin login just fill in the token below (Recommended)
+	// The user needs to be memeber of the groups, or superadmind
+	// Otherwise you don't see the group meetings
+	//
     'loginToken' => 'your-api-key',
     'loggingToFileEnabled' => false,
     'loggingToConsoleEnabled' => false,
