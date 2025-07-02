@@ -165,9 +165,9 @@ if ($cachePool->hasItem($cacheKeyCalEntries) && $cachePool->hasItem($cacheKeyGro
                         $kuwEntry->setClassTitle($calendarTitle);
                         $kuwEntry->setUID($meeting->getID() . "." . $meeting->getGroupID());
                         $kuwEntry->setIsCanceled($meeting->getIsCanceled());
-                        $kuwEntry->setStartDate(new DateTime($meeting->getDateFrom()));
+                        $kuwEntry->setStartDate(new DateTime($meeting->getDateFrom(), new DateTimeZone("UTC")));
                         if ($untilTime != null) {
-                            $kuwEntry->setEndTime(new DateTime($untilTime));
+                            $kuwEntry->setEndTime(new DateTime($untilTime, new DateTimeZone("UTC")));
                         }
                         $isFirst = true;
                         if ($pollResult != null) {
@@ -238,10 +238,13 @@ if (!$hasError && isset($_REQUEST["format"]) && $_REQUEST["format"] == "ics") {
 //                }
                 $eventobj = new CalendarEvent();
                 $eventobj->setUid($meeting->getUID() . "@ref-nidau.ch");
+				$meeting->getStartDate()->setTimezone($tzDate);
+
                 $eventobj->setStart($meeting->getStartDate());
 
                 $endTime = $meeting->getEndDateTime();
                 if ($endTime != null) {
+					$endTime->setTimezone($tzDate);
                     $eventobj->setSummary($calSummary);
                     $eventobj->setEnd($endTime);
                 } else {
@@ -272,6 +275,7 @@ if (!$hasError && isset($_REQUEST["format"]) && $_REQUEST["format"] == "ics") {
     echo $calendarExport->getStream();
 } else {
     $now = new DateTime();
+    $tzDate = new DateTimeZone('Europe/Zurich');
 
     ?>
     <!doctype html>
@@ -319,11 +323,11 @@ if (!$hasError && isset($_REQUEST["format"]) && $_REQUEST["format"] == "ics") {
                         <h2 class="group-title"><?= $calName ?></h2>
             <?php foreach ($calEntries as $meeting) {
                 $isPast = $now > $meeting->getStartDate();
-
+				$meeting->getStartDate()->setTimezone($tzDate);
                 ?>
                             <div class="row <?= $isPast ? "ispast" : "" ?>">
                 <?php if ($meeting->isCanceled()) { ?><strike><?php } ?>
-                                    <div class="col-4 <?= $meeting->isCanceled() ? "bg-danger" : "" ?>"><?= $meeting->getStartDate()->format("d.m.Y H:i") ?> <?= ($meeting->getEndTime() != null ? "- " . $meeting->getEndTime() . " " : "") ?>
+                                    <div class="col-4 <?= $meeting->isCanceled() ? "bg-danger" : "" ?>"><?= $meeting->getStartDate()->format("d.m.Y H:i e") ?> <?= ($meeting->getEndTime() != null ? "- " . $meeting->getEndTime() . " " : "") ?>
                 <?php if ($meeting->isCanceled()) { ?></strike><br />Treffen wurde abgesagt</span><?php } ?>
                             </div>
                             <div class="col-8">
